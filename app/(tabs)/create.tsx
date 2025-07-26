@@ -303,19 +303,7 @@ useFocusEffect(
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Statistiques</Text>
-          <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
-              <Text style={styles.statNumber}>{categories.length}</Text>
-              <Text style={styles.statLabel}>Catégories</Text>
-            </View>
-            <View style={styles.statCard}>
-              <Text style={styles.statNumber}>∞</Text>
-              <Text style={styles.statLabel}>Notes possibles</Text>
-            </View>
-          </View>
-        </View>
+
       </ScrollView>
 
       {/* Modal des modèles */}
@@ -451,33 +439,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 16,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  statCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    flex: 1,
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2196F3',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-  },
+
   modalOverlay: {
     position: 'absolute',
     top: 0,

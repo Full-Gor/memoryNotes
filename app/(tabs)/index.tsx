@@ -306,7 +306,7 @@ export default function HomeScreen() {
             onPress={() => setViewMode('list')}
           >
             <Text style={[styles.viewModeButtonText, viewMode === 'list' && styles.viewModeButtonTextActive]}>
-              Liste
+              Notes
             </Text>
           </TouchableOpacity>
         </View>

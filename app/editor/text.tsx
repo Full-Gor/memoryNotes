@@ -22,10 +22,16 @@ import {
   X,
   Type,
   FileText,
+  Bold,
+  Italic,
+  Underline,
+  Highlighter,
 } from 'lucide-react-native';
 import ReminderPicker from '@/components/ReminderPicker';
 import { FONTS, getFontStyle } from '@/utils/fonts';
 import { TEMPLATES, applyTemplate, Template } from '@/utils/templates';
+
+
 
 export default function TextEditorScreen() {
   const router = useRouter();
@@ -50,6 +56,12 @@ export default function TextEditorScreen() {
   const [selectedFont, setSelectedFont] = useState(existingNote?.font || getStringParam(templateFont) || 'System');
   const [showFontPicker, setShowFontPicker] = useState(false);
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+  
+  // États pour le formatage (mode toggle)
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
+  const [isHighlight, setIsHighlight] = useState(false);
 
   const colorOptions = [
     '#fff', '#ffebee', '#e8f5e8', '#fff3e0', '#f3e5f5', '#e0f2f1', '#fff8e1'
@@ -165,6 +177,8 @@ export default function TextEditorScreen() {
     Alert.alert('Modèle appliqué', `Le modèle "${template.name}" a été appliqué avec succès !`);
   };
 
+
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor }]}>
       <View style={styles.header}>
@@ -178,15 +192,57 @@ export default function TextEditorScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <TextInput
-          style={[styles.titleInput, getFontStyle(selectedFont)]}
-          placeholder="Titre de la note"
-          value={title}
-          onChangeText={setTitle}
-        />
+        <View style={styles.titleContainer}>
+          <TextInput
+            style={[
+              styles.titleInput, 
+              getFontStyle(selectedFont),
+              isBold && styles.titleBold,
+              isItalic && styles.titleItalic,
+              isUnderline && styles.titleUnderline,
+              isHighlight && styles.titleHighlight,
+            ]}
+            placeholder="Titre de la note"
+            value={title}
+            onChangeText={setTitle}
+          />
+          <View style={styles.formattingButtons}>
+            <TouchableOpacity 
+              style={[styles.formatButton, isBold && styles.formatButtonActive]}
+              onPress={() => setIsBold(!isBold)}
+            >
+              <Bold size={16} color={isBold ? "#2196F3" : "#666"} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.formatButton, isItalic && styles.formatButtonActive]}
+              onPress={() => setIsItalic(!isItalic)}
+            >
+              <Italic size={16} color={isItalic ? "#2196F3" : "#666"} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.formatButton, isUnderline && styles.formatButtonActive]}
+              onPress={() => setIsUnderline(!isUnderline)}
+            >
+              <Underline size={16} color={isUnderline ? "#2196F3" : "#666"} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.formatButton, isHighlight && styles.formatButtonActive]}
+              onPress={() => setIsHighlight(!isHighlight)}
+            >
+              <Highlighter size={16} color={isHighlight ? "#2196F3" : "#666"} />
+            </TouchableOpacity>
+          </View>
+        </View>
 
         <TextInput
-          style={[styles.contentInput, getFontStyle(selectedFont)]}
+          style={[
+            styles.contentInput, 
+            getFontStyle(selectedFont),
+            isBold && styles.contentBold,
+            isItalic && styles.contentItalic,
+            isUnderline && styles.contentUnderline,
+            isHighlight && styles.contentHighlight,
+          ]}
           placeholder="Contenu de la note..."
           value={content}
           onChangeText={setContent}
@@ -473,10 +529,57 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 16,
+    marginBottom: 8,
     padding: 12,
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 8,
+    flex: 1,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 8,
+  },
+  formattingButtons: {
+    flexDirection: 'row',
+    gap: 4,
+  },
+  formatButton: {
+    padding: 8,
+    borderRadius: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  formatButtonActive: {
+    backgroundColor: '#e3f2fd',
+    borderColor: '#2196F3',
+  },
+  titleBold: {
+    fontWeight: 'bold',
+  },
+  titleItalic: {
+    fontStyle: 'italic',
+  },
+  titleUnderline: {
+    textDecorationLine: 'underline',
+  },
+  titleHighlight: {
+    backgroundColor: '#fff3cd',
+  },
+
+  contentBold: {
+    fontWeight: 'bold',
+  },
+  contentItalic: {
+    fontStyle: 'italic',
+  },
+  contentUnderline: {
+    textDecorationLine: 'underline',
+  },
+  contentHighlight: {
+    backgroundColor: '#fff3cd',
   },
   contentInput: {
     fontSize: 16,

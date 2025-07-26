@@ -76,6 +76,59 @@ export default function NoteDetailScreen() {
         }
     };
 
+    // Fonctions spécifiques pour chaque type de contenu
+    const handleEditContent = (contentType: string) => {
+        switch (contentType) {
+            case 'text':
+                router.push(`/editor/text?edit=${note.id}&focus=content`);
+                break;
+            case 'checklist':
+                router.push(`/editor/checklist?edit=${note.id}&focus=items`);
+                break;
+            case 'drawing':
+                router.push(`/editor/drawing?edit=${note.id}&focus=canvas`);
+                break;
+            case 'voice':
+                router.push(`/editor/voice?edit=${note.id}&focus=recording`);
+                break;
+            case 'timer':
+                router.push(`/editor/timer?edit=${note.id}&focus=duration`);
+                break;
+        }
+    };
+
+    const handleDeleteContent = (contentType: string) => {
+        Alert.alert(
+            'Supprimer le contenu',
+            `Êtes-vous sûr de vouloir supprimer le contenu de cette ${contentType} ?`,
+            [
+                { text: 'Annuler', style: 'cancel' },
+                {
+                    text: 'Supprimer', style: 'destructive', onPress: () => {
+                        // Supprimer seulement le contenu spécifique
+                        switch (contentType) {
+                            case 'text':
+                                updateNote(note.id, { content: '' });
+                                break;
+                            case 'checklist':
+                                updateNote(note.id, { checklistItems: [] });
+                                break;
+                            case 'drawing':
+                                updateNote(note.id, { drawingElements: [] });
+                                break;
+                            case 'voice':
+                                updateNote(note.id, { audioPath: undefined });
+                                break;
+                            case 'timer':
+                                updateNote(note.id, { timerDuration: 0, isTimerActive: false });
+                                break;
+                        }
+                    }
+                },
+            ]
+        );
+    };
+
     const loadAudio = async () => {
         if (!note.audioPath) return;
 
@@ -186,16 +239,18 @@ export default function NoteDetailScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <ArrowLeft size={24} color="#333" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle} numberOfLines={1}>
-                    {note.title || 'Note sans titre'}
-                </Text>
-                <View style={styles.headerActions}>
-                    <TouchableOpacity onPress={handleEdit} style={styles.actionButton}>
-                        <Edit3 size={20} color="#2196F3" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={handleDelete} style={styles.actionButton}>
-                        <Trash2 size={20} color="#f44336" />
-                    </TouchableOpacity>
+                <View style={styles.titleContainer}>
+                    <Text style={styles.headerTitle} numberOfLines={1}>
+                        {note.title || 'Note sans titre'}
+                    </Text>
+                                            <View style={styles.headerActions}>
+                            <TouchableOpacity onPress={handleEdit} style={styles.actionButton}>
+                                <Edit3 size={24} color="#2196F3" />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleDelete} style={styles.actionButton}>
+                                <Trash2 size={24} color="#f44336" />
+                            </TouchableOpacity>
+                        </View>
                 </View>
             </View>
 
@@ -214,12 +269,32 @@ export default function NoteDetailScreen() {
 
                 {note.type === 'text' ? (
                     <View>
-                        <Text style={styles.label}>Note texte</Text>
+                        <View style={styles.contentHeader}>
+                            <Text style={styles.label}>Note texte</Text>
+                            <View style={styles.contentActions}>
+                                <TouchableOpacity onPress={handleEdit} style={styles.actionButton}>
+                                    <Edit3 size={24} color="#2196F3" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={handleDelete} style={styles.actionButton}>
+                                    <Trash2 size={24} color="#f44336" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                         <Text style={[styles.noteContent, getFontStyle(note.font || 'System')]}>{note.content}</Text>
                     </View>
                 ) : note.type === 'checklist' && note.checklistItems ? (
                     <View>
-                        <Text style={styles.label}>Checklist</Text>
+                        <View style={styles.contentHeader}>
+                            <Text style={styles.label}>Checklist</Text>
+                            <View style={styles.contentActions}>
+                                <TouchableOpacity onPress={handleEdit} style={styles.actionButton}>
+                                    <Edit3 size={20} color="#2196F3" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={handleDelete} style={styles.actionButton}>
+                                    <Trash2 size={20} color="#f44336" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                         {note.checklistItems.map((item, idx) => (
                             <Text key={item.id} style={styles.checklistItem}>
                                 {item.completed ? '✅' : '⬜️'} {item.text}
@@ -228,7 +303,17 @@ export default function NoteDetailScreen() {
                     </View>
                 ) : note.type === 'timer' ? (
                     <View>
-                        <Text style={styles.label}>Minuteur</Text>
+                        <View style={styles.contentHeader}>
+                            <Text style={styles.label}>Minuteur</Text>
+                            <View style={styles.contentActions}>
+                                <TouchableOpacity onPress={handleEdit} style={styles.actionButton}>
+                                    <Edit3 size={20} color="#2196F3" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={handleDelete} style={styles.actionButton}>
+                                    <Trash2 size={20} color="#f44336" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                         <View style={styles.timerContainer}>
                             <Clock size={32} color="#E91E63" />
                             <Text style={styles.timerDuration}>
@@ -244,7 +329,17 @@ export default function NoteDetailScreen() {
                     </View>
                 ) : note.type === 'drawing' && note.drawingElements ? (
                     <View>
-                        <Text style={styles.label}>Dessin</Text>
+                        <View style={styles.contentHeader}>
+                            <Text style={styles.label}>Dessin</Text>
+                            <View style={styles.contentActions}>
+                                <TouchableOpacity onPress={handleEdit} style={styles.actionButton}>
+                                    <Edit3 size={20} color="#2196F3" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={handleDelete} style={styles.actionButton}>
+                                    <Trash2 size={20} color="#f44336" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                         <View style={styles.drawingContainer}>
                             <Svg width={SCREEN_WIDTH - 64} height={300}>
                                 <Rect
@@ -263,7 +358,17 @@ export default function NoteDetailScreen() {
                     </View>
                 ) : note.type === 'voice' ? (
                     <View>
-                        <Text style={styles.label}>Mémo vocal</Text>
+                        <View style={styles.contentHeader}>
+                            <Text style={styles.label}>Mémo vocal</Text>
+                            <View style={styles.contentActions}>
+                                <TouchableOpacity onPress={handleEdit} style={styles.actionButton}>
+                                    <Edit3 size={20} color="#2196F3" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={handleDelete} style={styles.actionButton}>
+                                    <Trash2 size={20} color="#f44336" />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
                         <View style={styles.audioContainer}>
                             <TouchableOpacity onPress={togglePlayback} style={styles.playButton}>
                                 {isPlaying ? (
@@ -360,19 +465,29 @@ const styles = StyleSheet.create({
     backButton: {
         padding: 8,
     },
+    titleContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 8,
+    },
     headerTitle: {
         flex: 1,
         fontSize: 18,
         fontWeight: '600',
         color: '#333',
-        marginLeft: 8,
     },
     headerActions: {
         flexDirection: 'row',
         gap: 8,
+        marginLeft: 30,
     },
     actionButton: {
         padding: 8,
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        borderRadius: 6,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
     },
     content: {
         flex: 1,
@@ -390,6 +505,22 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#333',
         marginBottom: 8,
+    },
+    contentHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        padding: 8,
+        borderRadius: 8,
+    },
+    contentActions: {
+        flexDirection: 'row',
+        gap: 8,
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        padding: 4,
+        borderRadius: 6,
     },
     noteContent: {
         fontSize: 16,
